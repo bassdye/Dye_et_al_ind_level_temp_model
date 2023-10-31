@@ -2,7 +2,7 @@
 The model framework is based on the individual level component of the consumer-resource model described by Persson et al. (1998) and the temperature dependent scaling formulation in Karås &amp; Thoresson (1992) and Ohlberger et al. (2011). 
 
 ## Model analysis
-The Escalator Boxcar Train (EBT) program package developed by [Andre de Roos](https://staff.fnwi.uva.nl/a.m.deroos/index.html) was used to conduct the model simulations.
+The Escalator Boxcar Train (EBT) program package developed by [André de Roos](https://staff.fnwi.uva.nl/a.m.deroos/index.html) was used to conduct the model simulations.
 - The EBT package software for model analysis is available [here](https://staff.fnwi.uva.nl/a.m.deroos/EBT/Software/index.html). 
 - EBT package software documentation is available [here](https://staff.fnwi.uva.nl/a.m.deroos/EBT/Documentation/index.html).
 
