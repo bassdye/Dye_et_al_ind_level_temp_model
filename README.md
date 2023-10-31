@@ -10,7 +10,7 @@ The Escalator Boxcar Train (EBT) program package developed by [André de Roos](h
 - See the [model_specific_files folder](https://github.com/bassdye/Dye_et_al_ind_level_temp_model/tree/main/model_specific_files) for the model definition files.
 - See the [species_specific_files folder](https://github.com/bassdye/Dye_et_al_ind_level_temp_model/tree/main/species_specific_files) for the species specific model input files (control variable files (.cvf) and initial state files (.isf)).
   - Files for decadel temperature regimes (1980s, 2010s) are located in separate folders.
-  - Resource levels (1.0, 0.7, 0.5) indicated in file name (e.g. feed_1 is resource level 1).
+  - Resource levels (1.0, 0.7, 0.5) are indicated in file name (e.g. feed_1 is resource level 1).
 
 ## Dye et al. publication 
 <sup>Submitted to the journal Fish and Fisheries for peer review.<sup>
