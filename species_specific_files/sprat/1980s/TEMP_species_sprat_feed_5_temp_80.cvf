@@ -1,0 +1,103 @@
+"Fixed step size or integration accuracy when adaptive"                      1.0E-6
+"Cohort cycle time interval"                                                 1.0
+"Tolerance value, determining identity with zero"                            1.0E-5
+
+"Maximum integration time"                                               10000.0
+"Output time interval"                                                       1.0
+"Complete state output interval, 0 for none"                                 1.0
+
+"Minimum allowable number of individuals in cohort"                          0.0       0.0
+
+"Relative tolerances for i-state variable #0  age"                           0.0       0.0
+"                        i-state variable #1  bone"                          0.0       0.0
+"                        i-state variable #2  fat"                           0.0       0.0
+"                        i-state variable #3  gonads"                        0.0       0.0
+
+"Absolute tolerances for i-state variable #0"                                0.0       0.0
+"                        i-state variable #1"                                0.0       0.0
+"                        i-state variable #2"                                0.0       0.0
+"                        i-state variable #3"                                0.0       0.0
+
+"[ 0] Number of days in one year 			  YEAR"            250
+"[ 1] Volume : Bottom ratio (m, i.e. avg depth)           VOLBOT_RATIO"     50
+"[ 2] Reference volume (m^3)                              VOLUME"            1
+
+"[ 3][PARONE+ 0]  Environmental temperature 		  TEMP"       	    11
+"[ 4][PARONE+ 1]  Feeding level   			   FEEDING_LEVEL"    0.5
+
+"[ 5][PARONE+ 2]  Growth rate zooplankton                 RPLANKTON"         0.1
+"[ 6][PARONE+ 3]  Carrying capacity zoopl (g*m^3)         KPLANKTON"         0
+
+"[ 7][PARONE+ 4]  Date of sprat spawning decision         SPAWNSET"        200
+"[ 8][PARONE+ 5]  Date of maximum sprat spawning          SPAWNMAX"          0.5
+"[ 9][PARONE+ 6]  Duration of spawning period in sprat    SPAWNPERIOD"       1
+"[10][PARONE+ 7]  Grouping period of newborn sprat        SPAWNGROUP"       10.0
+
+"[11][PARONE+ 8]  Background mortality                    MUB"               0.0
+"[12][PARONE+ 9]  Size-dependent mortality constant       MUSDC"             0.0
+"[13][PARONE+10]  Size-dep. mortality characteristic size MUSDMASS"          0.0
+"[14][PARONE+11]  Starvation mortality constant           MUS"               0.0
+"[15][PARONE+12]  Egg mortality                           EGGMORT"           0.0
+"[16][PARONE+13]  Mortality of yolk-sac larvae            YOLKMORT"          0.0
+
+"[17][PARONE+14]  Size of start fishing vulnerability     FSTARTW"           5
+"[18][PARONE+15]  Size of 50% fishing vulnerability       FHALFW"            9
+"[19][PARONE+16]  Fishing mortality                       FMORT"             0
+
+"[20][PARONE+17]  Weight-length(!) scaling constant       LWC"               5.4
+"[21][PARONE+18]  Weight-length scaling exponent          LWE"               0.33
+
+"[22][PARONE+19]  Duration of egg period (8-16 days)      EGGPERIOD"        17
+"[23][PARONE+20]  Age at first feeding (10-20 days)       AGEFEEDING"       25 
+"[24][PARONE+21]  Total weight at birth                   BIRTHWEIGHT"       5.0E-4 
+"[25][PARONE+22]  Maturation length                       MATURELEN"         9
+
+"[26][PARONE+23]  Starvation condition threshold          QS"                0.2
+"[27][PARONE+24]  Juvenile condition target               QJ"                0.9
+"[28][PARONE+25]  Adult condition target                  QA"                1.4
+"[29][PARONE+26]  Threshold condition for spawning        QSPAWN"            0.9
+
+"[30][PARONE+27]  Maintenance scaling constant            MAINTC"            0.03
+"[31][PARONE+28]  Maintenance scaling exponent            MAINTE"            0.8
+
+"[32][PARONE+29]  Digestion time scaling constant         DIGTIMEC"          4.8
+"[33][PARONE+30]  Digestion time scaling exponent         DIGTIMEE"         -0.74
+
+"[34][PARONE+31]  Maximum attack rate                     ARATEPMAX"       150
+"[35][PARONE+32]  Mass at maximum attack                  ARATEPWOPT"        15
+"[36][PARONE+33]  Maximum attack rate exponent            ARATEPEXP"         0.5
+
+"[37][PARONE+34]  Conversion efficiency                   CONVEFF"           0.5
+"[38][PARONE+35]  Reproductive conversion efficiency      REPROEFF"          0.5
+
+"[39][PARONE+36]  Allometric scalar of Qm; metabolism     GA_M"              2.25
+"[40][PARONE+37]  Allometric exponent of Qm; metabolism   THETA_M"           0.081
+"[41][PARONE+38]  Allometric scalar of Tmax; metabolism   YMAX_M"           26.5
+"[42][PARONE+39]  Allometric exponent of Tmax; metabolism VMAX_M"	    -0.05
+"[43][PARONE+40]  Allometric scalar of Topt; metabolism   YOPT_M" 	    20.0
+"[44][PARONE+41]  Allometric exponent of Topt; metabolism VOPT_M"           -0.028
+
+"[45][PARONE+42]  Allometric scalar of Qa; ingestion      GA_A"              2.2
+"[46][PARONE+43]  Allometric exponent of Qa; ingestion    THETA_A"           0.0775
+"[47][PARONE+44]  Allometric scalar of Tmax; ingestion	  YMAX_A"           25.0
+"[48][PARONE+45]  Allometric exponent of Tmax; ingestion  VMAX_A"	    -0.0475
+"[49][PARONE+46]  Allometric scalar of Topt; ingestion    YOPT_A" 	    21.0
+"[50][PARONE+47]  Allometric exponent of Topt; ingestion  VOPT_A"           -0.055
+
+"[51][PARONE+48]  Simply ingestion time scaling constant  INGESTC"           0.46
+"[52][PARONE+49]  Simply ingestion time scaling exponent  INGESTE"           0.215
+
+"[53][PARONE+50]  Temperature sin function mean value      T_MEAN"          12.85
+"[54][PARONE+51]  Temperature sin function amplitude          T_A"           5.3
+"[55][PARONE+52]  Temperature sin function phase shift    T_OMEGA"         187
+
+"[56][PARONE+53]  Resource sin function mean value         R_MEAN"           1
+"[57][PARONE+54]  Resource sin function amplitude             R_A"           0.45
+"[58][PARONE+55]  Resource sin function phase shift       R_OMEGA"         187
+		    
+"Index of the bifurcation parameter"                                        50.0
+"Step size in the bifurcation parameter"                                     0.0001
+"Final value of the bifurcation parameter"                                   1.0
+"Linear (0) or logarithmic (1) parameter change"                             0.0
+"Period of output generation in bifurcation"                             12500.0
+"Period of state output in bifurcation"                                      0.0
