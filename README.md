@@ -11,6 +11,8 @@ The Escalator Boxcar Train (EBT) program package developed by [Andre de Roos](ht
 - See the [species_specific_files folder](https://github.com/bassdye/Dye_et_al_ind_level_temp_model/tree/main/species_specific_files) for the species specific model input files (control variable files (.cvf) and initial state files (.isf)). 
 
 ## Dye et al. publication 
+<sup>Submitted to the journal Fish and Fisheries for peer review.<sup>
+
 Disentangling the effects of resource level and temperature-dependence on the performance of fish species in different guild
 
 _Abstract_
