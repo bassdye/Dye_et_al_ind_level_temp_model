@@ -84,8 +84,8 @@
 "[49][PARONE+46]  Allometric scalar of Topt; ingestion    YOPT_A" 	    16.0
 "[50][PARONE+47]  Allometric exponent of Topt; ingestion  VOPT_A"           -0.072
 
-"[51][PARONE+48]  Simply ingestion time scaling constant  INGESTC"           2.25
-"[52][PARONE+49]  Simply ingestion time scaling exponent  INGESTE"           0.01
+"[51][PARONE+48]  Simply ingestion time scaling constant  INGESTC"           1.8
+"[52][PARONE+49]  Simply ingestion time scaling exponent  INGESTE"           0.05
 
 "[53][PARONE+50]  Temperature sin function mean value      T_MEAN"          14.3
 "[54][PARONE+51]  Temperature sin function amplitude          T_A"           5.25
@@ -94,6 +94,11 @@
 "[56][PARONE+53]  Resource sin function mean value         R_MEAN"           1
 "[57][PARONE+54]  Resource sin function amplitude             R_A"           0.45
 "[58][PARONE+55]  Resource sin function phase shift       R_OMEGA"         187
+
+"[59][PARONE+56]  Temperature sin function mean value T_MEAN_HEAT"         -26.0
+"[60][PARONE+57]  Temperature sin function amplitude     T_A_HEAT"          50.0
+"[61][PARONE+58]  Start of heat wave                     START_HW"         119.0
+"[62][PARONE+59]  End of heat wave                         END_HW"         132.0
 			    
 "Index of the bifurcation parameter"                                        50.0
 "Step size in the bifurcation parameter"                                     0.0001
