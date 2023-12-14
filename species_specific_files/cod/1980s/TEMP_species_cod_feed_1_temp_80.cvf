@@ -30,7 +30,7 @@
 
 "[ 7][PARONE+ 4]  Date of spawning decision               SPAWNSET"        200
 "[ 8][PARONE+ 5]  Date of maximum spawning                SPAWNMAX"          0.5
-"[ 9][PARONE+ 6]  Duration of spawning period in          SPAWNPERIOD"       1
+"[ 9][PARONE+ 6]  Duration of spawning period             SPAWNPERIOD"       1
 "[10][PARONE+ 7]  Grouping period of newborn              SPAWNGROUP"       10.0
 
 "[11][PARONE+ 8]  Background mortality                    MUB"               0.0
