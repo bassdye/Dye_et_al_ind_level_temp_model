@@ -28,10 +28,10 @@
 "[ 5][PARONE+ 2]  Growth rate zooplankton                 RPLANKTON"         0.1
 "[ 6][PARONE+ 3]  Carrying capacity zoopl (g*m^3)         KPLANKTON"         0
 
-"[ 7][PARONE+ 4]  Date of sprat spawning decision         SPAWNSET"        200
-"[ 8][PARONE+ 5]  Date of maximum sprat spawning          SPAWNMAX"          0.5
-"[ 9][PARONE+ 6]  Duration of spawning period in sprat    SPAWNPERIOD"       1
-"[10][PARONE+ 7]  Grouping period of newborn sprat        SPAWNGROUP"       10.0
+"[ 7][PARONE+ 4]  Date of spawning decision               SPAWNSET"        200
+"[ 8][PARONE+ 5]  Date of maximum spawning.               SPAWNMAX"          0.5
+"[ 9][PARONE+ 6]  Duration of spawning period             SPAWNPERIOD"       1
+"[10][PARONE+ 7]  Grouping period of newborn              SPAWNGROUP"       10.0
 
 "[11][PARONE+ 8]  Background mortality                    MUB"               0.0
 "[12][PARONE+ 9]  Size-dependent mortality constant       MUSDC"             0.0
