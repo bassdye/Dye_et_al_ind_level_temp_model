@@ -36,148 +36,27 @@
 // General directives
 #define IMMEDIATE_HATCHING      1               // 1: Cohort is filled at first day of spawngroup
 #define EGGM_EQ_SDM             0               // 0: Following Ohlberger et al. 2011, no egg mortality; 1: egg/yolk-sac mortality follows size-dep. mortality
-#define END_INV                 0               // 1: ForcedRunEnd if R0 > 1.5 or R0 < 0.5
-#define R0_OUTPUT               2               // 0: None; 1: output of ReproOutputs[][]; 2: In addition, output of collapsed matrix
+
+// #define END_INV                 0               // 1: ForcedRunEnd if R0 > 1.5 or R0 < 0.5
+// #define R0_OUTPUT               2               // 0: None; 1: output of ReproOutputs[][]; 2: In addition, output of collapsed matrix
+
 #define RM_CALCULATION          1               // 0: Calculate maintenace with total weight (Ohlberger et al. 2011); 1: Calculate with standarized weight (Kooijman, 2010)
 #define TEMPERATURE             1               // 0: Constant temperature; 1: Seasonally varying temperature using temp_sin function 
+#define HEAT_WAVE               0               // 0: No heat wave; 1: Include heat wave(s) using heat_wave function
 #define RESOURCE                0               // 0: Constant resource; 1: Seasonally varying resource using resource_sin function 
 
 // Species directives      
-#define SPECIES_SINGLE          1               // 1: Single cohort (i.e. individual level), no feedback on environment (i.e. constant resource)
-#define SPECIES_COHORT          0               // 1: Multiple cohorts (i.e. population level), feedback on environment
-#define SPECIES_INVADE          0
+#define SPECIES_SINGLE          1               // 1: Single cohort, no feedback on environment
+#define SPECIES_COHORT          0               // 1: Multiple cohorts, feedback on environment
 
-#if (BIFURCATION == 0)
+// #define SPECIES_INVADE          0 
+
+/*#if (BIFURCATION == 0)
 #undef  SPECIES_INVADE
 #define SPECIES_INVADE          0
-#endif
+#endif*/
 
 #include  "escbox.h"
-
-#if(USE_MKL == 1)
-#include  "mkl_vml.h"
-#else
-
-void    vdPowx(int n, double *x, double b, double *z)
-{ 
-  int   i;
-
-  for (i=0; i<n; i++)
-    z[i] = pow(x[i],b);
-
-  return;
-}
-    
-void    vdPowx_2(int n, double *x, double *b, double *z)
-{ 
-  int   i;
-
-  for (i=0; i<n; i++)
-    z[i] = pow(x[i],b[i]);
-
-  return;
-}
-
-void    vdMul(int n, double x, double *y, double *z) 
-{ 
-  int   i;
-
-  for (i=0; i<n; i++)
-    z[i] = x*y[i];
-
-  return;
-}
-   
-void    vdMul_2(int n, double *x, double *y, double *z) 
-{ 
-  int   i;
-
-  for (i=0; i<n; i++)
-    z[i] = x[i]*y[i];
-
-  return;
-}
-
-void    vdExp(int n, double *x, double *y)
-{ 
-  int   i;
-
-  for (i=0; i<n; i++)
-    y[i] = exp(x[i]);
-
-  return;
-}
-
-void    vdLog(int n, double *x, double *y) // removed [i] and *
-{
-  int   i;
-
-  for(i = 0; i<n;  i++)
-    y[i] = log(x[i]); 
-
-  return;
-}
-
-void    vdDiff(int n, double *x, double y, double *z) // 
-{
-  int   i;
-
-  for(i = 0; i<n; i++)
-    z[i] = x[i]-y; 
-
-  return;
-}
-
-void    vdDiff_2(int n, double *x, double *y, double *z) // 
-{
-  int   i;
-
-  for(i = 0; i<n; i++)
-    z[i] = x[i]-y[i]; 
-
-  return;
-}
-
-void    vdDiff_3(int n, double x, double *y, double *z) // 
-{
-  int   i;
-
-  for(i = 0; i<n; i++)
-    z[i] = x-y[i]; 
-
-  return;
-}
-
-void    vdAdd(int n, double *x, double y, double *z) // removed * from double y
-{
-  int   i;
-
-  for(i = 0; i<n; i++)
-    z[i] = x[i]+y; 
-
-  return;
-}
-
-void    vdDiv(int n, double x, double *y, double *z) //
-{
-  int   i;
-
-  for(i=0; i<n; i++)
-    z[i] = x/y[i];
-
-  return;
-}
-
-void    vdDiv_2(int n, double *x, double *y, double *z) //
-{
-  int   i;
-
-  for(i=0; i<n; i++)
-    z[i] = x[i]/y[i];
-
-  return;
-}
-#endif  
 
 /*
  *======================================================================
@@ -194,7 +73,7 @@ void    vdDiv_2(int n, double *x, double *y, double *z) //
 
 #define SPECIES           0
 
-#define age             (i_state( 0)) // second value of second row of .isf. First value is # individuals (refer to EBTmanual.pdf)
+#define age             (i_state( 0)) // Second value of second row of .isf. First value is # individuals (refer to EBTmanual.pdf)
 #define bone            (i_state( 1))
 #define fat             (i_state( 2))
 #define gonads          (i_state( 3))
@@ -221,20 +100,19 @@ void    vdDiv_2(int n, double *x, double *y, double *z) //
 
 // Mortality & reproduction rates set in updateIDcards()
 #define IDfecundity     (i_const(12))
-#define IDmort          (i_const(13)) // Initial mortality, change 0.0957458243 to 0.0 in if you want no initial mortality
+#define IDmort          (i_const(13)) 
 
 #define MILLI           0.001
 #define MICRO           1.0E-6
+#define DIV_1_400       0.0025        // Used in temperature equation
 
 #define MINCONDITION    1.0E-6
 #define FOODTINY        1.0E-10
 
-#define MAXCOHORTS      10000         
-#define INVADEDENSITY   1000
-#define INVADEPERIOD    30            
+#define MAXCOHORTS      10000         // Used as length for arrays in vdPowx() --> should be int however...
+/*#define INVADEDENSITY   1000
+#define INVADEPERIOD    30            // Period (in years) with cohort introductions for measuring invasion*/
 #define MINSURVIVAL     1.0E-9
-
-#define DIV_1_400       0.0025        // Used in temperature equation
 
 /*
  *======================================================================
@@ -344,28 +222,26 @@ static void             UpdateIDcards(double *env, population *pop);
 static int              TimeInYear;
 
 int                     ReproCohorts[POPULATION_NR];
-int                     NewCohort = -1, NewCCohort = -1; // Leaving NewCCohort for now, could change name or delete variable
+int                     NewCohort = -1;
 
-double                  YOYsurvival[POPULATION_NR];
-double                  SizeOYO[POPULATION_NR];
 double                  TotalRepro[POPULATION_NR];
 double                  MeanFecundity[POPULATION_NR];
 
-#if ((SPECIES_INVADE == 1)) // || (COD_INVADE == 1))
+/*#if ((SPECIES_INVADE == 1)) // || (COD_INVADE == 1))
 double                  ReproOutputs[INVADEPERIOD][INVADEPERIOD], LastInvasionStart = -1;
 #if ((R0_OUTPUT == 1) || (R0_OUTPUT == 2))
 static FILE             *reprofile  = NULL;
 #endif
-#endif
+#endif*/
 
 #if (LENGTHCURVES > 0)
 static double           BirthTimes[LENGTHCURVES];
 #endif
 
-#if (BIFURCATION == 1)
+/*#if (BIFURCATION == 1)
 #define VARIANCES       2                       // Output variances as CVs
 //#include  "MeasureBifstats.c"
-#endif
+#endif*/
 
 double          mass[MAXCOHORTS];
 double          weight[MAXCOHORTS];
@@ -373,15 +249,15 @@ double          length[MAXCOHORTS];
 double          sdmmass[MAXCOHORTS];
 double          sdmort[MAXCOHORTS];
 double          partial_maint[MAXCOHORTS];
-double          partial_htime[MAXCOHORTS];
 double          partial_ingest[MAXCOHORTS];
-double          partial_aratep[MAXCOHORTS];
+double          partial_htime[MAXCOHORTS];
+double          partial_arate[MAXCOHORTS];
 double          mratio[MAXCOHORTS];
 double          mratiomin[MAXCOHORTS];
 double          aratepE[MAXCOHORTS];
 double          aratep1[MAXCOHORTS];
 
-// Define variables to solve for temperature dependent metabolic and ingestion rates
+// Define variables to solve for things like temperature dependent metabolic and ingestion rates
 double         rm_weight[MAXCOHORTS];
 double         temporary_Tmax_m[MAXCOHORTS], Tmax_m[MAXCOHORTS], temporary_Topt_m[MAXCOHORTS], Topt_m[MAXCOHORTS], temp_Q_m[MAXCOHORTS];
 double         Q_m[MAXCOHORTS], log_Q_m[MAXCOHORTS], temp_diff_m[MAXCOHORTS], temp_diff_m_add_2[MAXCOHORTS], Y_m[MAXCOHORTS], W_m[MAXCOHORTS];
@@ -408,8 +284,6 @@ double         ENV_TEMP, ENV_RESOURCE;
  */
 
 double  Sigmoid(double val, double low, double half)
-
-
 {
   double                result = 0.0, nx;
 
@@ -425,31 +299,152 @@ double  Sigmoid(double val, double low, double half)
   return result;
 }
 
-// Changing temperature function
+void    vdPowx(int n, double *x, double b, double *z)
+{ 
+  int   i;
+
+  for (i=0; i<n; i++)
+    z[i] = pow(x[i],b);
+
+  return;
+}
+
+// Functions to solve temperature dependent ingestion and maintenance functions
+void    vdPowx_2(int n, double *x, double *b, double *z)
+{ 
+  int   i;
+
+  for (i=0; i<n; i++)
+    z[i] = pow(x[i],b[i]);
+
+  return;
+}
+
+void    vdMul(int n, double x, double *y, double *z) 
+{ 
+  int   i;
+
+  for (i=0; i<n; i++)
+    z[i] = x*y[i];
+
+  return;
+}
+   
+void    vdMul_2(int n, double *x, double *y, double *z) 
+{ 
+  int   i;
+
+  for (i=0; i<n; i++)
+    z[i] = x[i]*y[i];
+
+  return;
+}
+
+void    vdExp(int n, double *x, double *y)
+{ 
+  int   i;
+
+  for (i=0; i<n; i++)
+    y[i] = exp(x[i]);
+
+  return;
+}
+
+void    vdLog(int n, double *x, double *y) // removed [i] and *
+{
+  int   i;
+
+  for(i = 0; i<n;  i++)
+    y[i] = log(x[i]); 
+
+  return;
+}
+
+void    vdDiff(int n, double *x, double y, double *z) // 
+{
+  int   i;
+
+  for(i = 0; i<n; i++)
+    z[i] = x[i]-y; 
+
+  return;
+}
+
+void    vdDiff_2(int n, double *x, double *y, double *z) // 
+{
+  int   i;
+
+  for(i = 0; i<n; i++)
+    z[i] = x[i]-y[i]; 
+
+  return;
+}
+
+void    vdDiff_3(int n, double x, double *y, double *z) // 
+{
+  int   i;
+
+  for(i = 0; i<n; i++)
+    z[i] = x-y[i]; 
+
+  return;
+}
+
+void    vdAdd(int n, double *x, double y, double *z) // removed * from double y
+{
+  int   i;
+
+  for(i = 0; i<n; i++)
+    z[i] = x[i]+y; 
+
+  return;
+}
+
+void    vdDiv(int n, double x, double *y, double *z) //
+{
+  int   i;
+
+  for(i=0; i<n; i++)
+    z[i] = x/y[i];
+
+  return;
+}
+
+void    vdDiv_2(int n, double *x, double *y, double *z) //
+{
+  int   i;
+
+  for(i=0; i<n; i++)
+    z[i] = x[i]/y[i];
+
+  return;
+}
+
+// Changing, seasonally varying temperature function
 double temp_sin(double T)
 
 {
   double temp;
   double PI = 3.141592653589793238463;
 
-  temp = T_MEAN + T_A*sin(2*PI*(T + T_OMEGA) / 250); 
+  temp = T_MEAN + T_A*sin(2*PI*(T + T_OMEGA) / YEAR); 
   return temp;
 }
 
-// Changing resource function 
+// Changing, seasonally varying resource function 
 double resource_sin(double T)
 
 {
   double resource;
   double PI = 3.141592653589793238463;
 
-  resource = R_MEAN + R_A*sin(2*PI*(T + R_OMEGA) / 250); 
+  resource = R_MEAN + R_A*sin(2*PI*(T + R_OMEGA) / YEAR); 
   return resource;
 
 }
 
 /*===========================================================================*/
-#if ((SPECIES_INVADE == 1)) // || (COD_INVADE == 1))
+/*#if ((SPECIES_INVADE == 1)) // || (COD_INVADE == 1))
 
 double DominantEigenvalue(double mat[INVADEPERIOD][INVADEPERIOD], int dim)
 
@@ -534,7 +529,7 @@ double DominantEigenvalue(double mat[INVADEPERIOD][INVADEPERIOD], int dim)
   return result;
 }
 
-#endif
+#endif*/
 
 /*
  *===========================================================================
@@ -546,19 +541,8 @@ double DominantEigenvalue(double mat[INVADEPERIOD][INVADEPERIOD], int dim)
 
 void    UserInit(int argc, char **argv, double *env, population *pop)
 
-
 {
   register int          i;
-
-  /*  switch (argc)
-    {
-    case 4:
-      C_MUB = atof(argv[3]);
-    case 3:
-      KCBENTHOS = atof(argv[2]);
-    default:
-      break;
-    } */
 
   ReportNote("\n    %s%s",
 #if (BIFURCATION == 1)
@@ -568,13 +552,13 @@ void    UserInit(int argc, char **argv, double *env, population *pop)
 #endif // BIFURCATION
              "\n");
 
-#if ((SPECIES_INVADE == 1))
+/*#if ((SPECIES_INVADE == 1))
 #if (END_INV == 1)
   ReportNote("Bifurcation is stopped when R0 > 1.5 or R0 < 0.5");
 #else
   ReportNote("Bifurcation is not stopped for any threshold R0");
 #endif  // END_INV
-#endif  // SPECIES_INVADE
+#endif  // SPECIES_INVADE*/
 
 #if (SPECIES_SINGLE == 1)
   ReportNote("Only a single cohort of species accounted for");
@@ -588,8 +572,8 @@ void    UserInit(int argc, char **argv, double *env, population *pop)
   pop[SPECIES][0][gonads] = 0.0;
 
   for (i=0; i<I_CONST_DIM; i++) popIDcard[SPECIES][0][i] = 0.0;
-  // Set plankton (i.e. food) to FEEDING_LEVEL; 
-  plankton = FEEDING_LEVEL;
+  
+  plankton = FEEDING_LEVEL; // Set plankton to FEEDING_LEVEL; 
 #endif
 
 #if (SPECIES_COHORT == 1)
@@ -604,7 +588,6 @@ void    UserInit(int argc, char **argv, double *env, population *pop)
       popIDcard[SPECIES][i][IDnbegin] = max(popIDcard[SPECIES][i][IDnbegin], pop[SPECIES][i][number]);
     }
 
-
 /*#if (BIFURCATION == 1)
 //  initMeasureBifstats(argv[1], 0);
 #endif */
@@ -618,18 +601,17 @@ void    UserInit(int argc, char **argv, double *env, population *pop)
 #endif
 
   ReportNote("Minimum survival extinction: %E", MINSURVIVAL);
+  ReportNote("CHECK_EXT: %d (0 - no action; 1 - message; 2 - message and quit)", CHECK_EXTINCTION);
 
-#if (EGGM_EQ_SDM == 1)
+#if (EGGM_EQ_SDM == 1) 
   ReportNote("egg/yolk-sac mortality follows size-dep. mortality");
-  EGGMORT  = MUSDC*exp(-BIRTHWEIGHT/MUSDMASS);
-  YOLKMORT = EGGMORT;
+  EGGMORT  = MUSDC*exp(-BIRTHWEIGHT/MUSDMASS); // OG mortality function
+  YOLKMORT = EGGMORT; // OG mortality function
 #endif
 
 #if (EGGM_EQ_SDM == 0)
-  ReportNote("NO egg/yolk-sac mortality");
+  ReportNote("No egg/yolk-sac mortality");
 #endif
-
-  ReportNote("CHECK_EXT: %d (0 - no action; 1 - message; 2 - message and quit)", CHECK_EXTINCTION);
 
 #if (IMMEDIATE_HATCHING == 1)
   ReportNote("Cohort is filled at first day of spawngroup");
@@ -678,7 +660,7 @@ void    SetBpointNo(double *env, population *pop, int *bpoint_no)
 
   TimeInYear = floor(fmod(time, YEAR) + MILLI);
 
-#if (SPECIES_SINGLE != 1 )
+#if (SPECIES_SINGLE != 1)
   if (TotalEggs > MICRO)
     {
       int       Hatching, CreateCohort, i;
@@ -733,16 +715,12 @@ void    SetBpointNo(double *env, population *pop, int *bpoint_no)
 #endif
             }
         }
-#if (IMMEDIATE_HATCHING == 0)
-      else 
-#endif
-        NewCohort =  -1;
+        NewCohort =  -1; 
     }
 #endif
 
   return;
 } 
-
 
 /*===========================================================================*/
 
@@ -820,16 +798,17 @@ void    Gradient(double *env,     population *pop,     population *ofs,
                 }
             }
         }
+
 #if ((SPECIES_SINGLE != 1) && (SPECIES_INVADE !=1))
       tot_grazingsp += popIDcard[SPECIES][i][IDingestPs]*pop[SPECIES][i][number];
 #endif
 
-    }
+      }
 
 #if(IMMEDIATE_HATCHING == 0)
-  double                nx, Hatching;
+    double                nx, Hatching;
 
-  if (NewCohort >= 0)
+    if (NewCohort >= 0)
     {
       nx = 3.0*(fmod(time, YEAR) - SPAWNSTART)/SPAWNPERIOD;
 
@@ -841,9 +820,6 @@ void    Gradient(double *env,     population *pop,     population *ofs,
       Hatching *= TotalEggs/(SPAWNPERIOD/3.0);
 
       mort  = popIDcard[SPECIES][NewCohort][IDmort];
-#if ( COD_FEEDBACK & 0x0100 )
-      mort += popIDcard[SPECIES][NewCohort][IDpiscmort];
-#endif
 
       popgrad[SPECIES][NewCohort][number] = Hatching - mort*pop[SPECIES][NewCohort][number];
       popgrad[SPECIES][NewCohort][age]    = 0.5;
@@ -852,7 +828,6 @@ void    Gradient(double *env,     population *pop,     population *ofs,
       popgrad[SPECIES][NewCohort][gonads] = 0.0;
     }
 #endif
-
 
   // Environment derivatives
   #if (SPECIES_SINGLE == 1) // No feedback of single cohort on resource
@@ -864,7 +839,6 @@ void    Gradient(double *env,     population *pop,     population *ofs,
   envgrad[1] = RPLANKTON * (KPLANKTON - plankton) - tot_grazingsp;
   envgrad[2] = 0.0;
   #endif
-
   return;
 }
 
@@ -976,7 +950,7 @@ void    InstantDynamics(double *env, population *pop, population *ofs)
               popIDcard[SPECIES][i][IDfecundity] = fecundity;
               popIDcard[SPECIES][i][IDlifefec]  += (fecundity*pop[SPECIES][i][number]/popIDcard[SPECIES][i][IDnbegin]);
 
-#if (SPECIES_INVADE == 1)
+/*#if (SPECIES_INVADE == 1)
               int       row, col;
 
               // row: the year number since start of invasions
@@ -985,9 +959,9 @@ void    InstantDynamics(double *env, population *pop, population *ofs)
               row = (int)floor((time - (LastInvasionStart + pop[SPECIES][i][age] - 0.5*cohort_limit))/YEAR);
               col = 1 + (int)floor((pop[SPECIES][i][age]-0.5*cohort_limit)/YEAR);
               ReproOutputs[row][col]          += (fecundity*pop[SPECIES][i][number]/INVADEDENSITY);
-#else
+#else*/
               TotalEggs                      += fecundity*pop[SPECIES][i][number];
-#endif
+// #endif
 
               ReproCohorts[SPECIES]++;
               TotalRepro[SPECIES]               += pop[SPECIES][i][number];
@@ -1002,7 +976,7 @@ void    InstantDynamics(double *env, population *pop, population *ofs)
       if (TotalRepro[SPECIES]) MeanFecundity[SPECIES] = TotalEggs/TotalRepro[SPECIES];
       else MeanFecundity[SPECIES] = 0.0;
 
-#if ((SPECIES_INVADE == 1) && (BIFURCATION == 1))
+/*#if ((SPECIES_INVADE == 1) && (BIFURCATION == 1))
       double            dummy = fmod(time, BifPeriod);
       if (((dummy + 0.5*cohort_limit) > (BifPeriod - 2*INVADEPERIOD*YEAR)) &&
           ((dummy + 0.5*cohort_limit) < (BifPeriod -   INVADEPERIOD*YEAR)))
@@ -1015,7 +989,7 @@ void    InstantDynamics(double *env, population *pop, population *ofs)
               memset((void *)ReproOutputs, 0, (INVADEPERIOD*INVADEPERIOD)*sizeof(double));
             }
         }
-#endif
+#endif*/
     }
 
   return;
@@ -1043,21 +1017,19 @@ void    DefineOutput(double *env, population *pop, double *output)
   for (j=0; j<LENGTHCURVES; j++) Lengths[j] = DBL_MAX;
 #endif
 
-
   UpdateIDcards(env, pop);
 
-#if (BIFURCATION == 1)
+/*#if (BIFURCATION == 1)
   TimeInYear = (int)floor(fmod(time, YEAR) + MILLI);
 
   LabelState(SPECIES, "par. = %.4f   T = %6.0f years, %3d days", parameter[BifParIndex],
              floor((env[0]+0.1*cohort_limit)/YEAR), TimeInYear);
- #endif // BIFURCATION
+ #endif // BIFURCATION*/
 
 #define OUTONE 1 // OUTONE 3
 
 #if (SPECIES_SINGLE == 1)
-  // Set output column two (first column is default set to time) to FEEDING_LEVEL; 
-  output[ 0] = FEEDING_LEVEL; 
+  output[ 0] = FEEDING_LEVEL; // Output column two; first column is set to time by default
   output[OUTONE+ 0] = pop[SPECIES][0][number];
   output[OUTONE+ 1] = pop[SPECIES][0][bone];
   output[OUTONE+ 2] = pop[SPECIES][0][fat];
@@ -1080,36 +1052,37 @@ void    DefineOutput(double *env, population *pop, double *output)
   output[OUTONE+17] = popIDcard[SPECIES][0][IDmass];
   output[OUTONE+18] = ENV_RESOURCE;
 
-#elif(SPECIES_INVADE !=1) // 
-  output[ 0] = plankton; 
+#elif(SPECIES_COHORT == 1) // 
+  output[ 0] = plankton; // Output column two; first column is set to time by default
+
   for (i=0; i<cohort_no[SPECIES]; i++)
     {
       num  = pop[SPECIES][i][number];
       biom = (pop[SPECIES][i][bone] + pop[SPECIES][i][fat] + pop[SPECIES][i][gonads])*pop[SPECIES][i][number];
 
-      if (pop[SPECIES][i][age]< (YEAR - MILLI))           // YOY
+      if (pop[SPECIES][i][age]< (YEAR - MILLI))          // YOY
         {
           output[OUTONE+ 0] += num; 
           output[OUTONE+ 1] += biom; 
         }
       else
         {
-          output[OUTONE+ 2] += num;                     // 1+
+          output[OUTONE+ 2] += num;                      // 1+
           output[OUTONE+ 3] += biom;
         }
-      if(popIDcard[SPECIES][i][IDlength] < MATURELEN)     // Juveniles
+      if(popIDcard[SPECIES][i][IDlength] < MATURELEN)    // Juveniles
         {
           output[OUTONE+ 4] += num; 
           output[OUTONE+ 5] += biom; 
         }
-      else                                              // Adults
+      else                                               // Adults
         {
           output[OUTONE+ 6] += num; 
           output[OUTONE+ 7] += biom; 
         }
 
-      output[OUTONE+ 8] += num;                         // Total population
-      output[OUTONE+ 9] += biom; 
+      output[OUTONE+ 8] += num;                          // Total population
+      output[OUTONE+ 9] += biom;   
 
 #if (LENGTHCURVES > 0)
       for (j=0; j<LENGTHCURVES; j++) 
@@ -1123,7 +1096,7 @@ void    DefineOutput(double *env, population *pop, double *output)
 #endif
     }
 
-  output[OUTONE+10] = popIDcard[SPECIES][0][IDlength]; 
+   output[OUTONE+10] = popIDcard[SPECIES][0][IDlength]; 
   output[OUTONE+11] = popIDcard[SPECIES][0][IDlifefec]; // Same value as TotalEggs += fecundity*pop[SPECIES][i][number] on line 931
   output[OUTONE+12] = time/YEAR; 
 
@@ -1136,7 +1109,7 @@ index = 14;
     }
 #endif
 
-#endif // Moved from line 1081 so single cohort output is only 19 outputs
+#endif 
 
 /*#if (BIFURCATION == 1)
 //  outputMeasureBifstats(env, NULL, OUTPUT_VAR_NR, 0);
@@ -1229,27 +1202,21 @@ index = 14;
 //  fprintf(stderr, "Time: %6.0f\tCohorts[0]: %5d\tCohorts[1]: %5d\n", env[0], cohort_no[0], cohort_no[1]);
 #endif
 */
+
   return;
 }
-
 
 /*==============================================================================*/
 
 static void     UpdateIDcards(double *env, population *pop)
 
 {
-  register int          i, s, c;
-  double                fatratio, l_ratio;
-  double                aratep, mass_encps, ingestps, ingestp_tot; //, mass_encpc, ingestpc
-  /*double                arateb, mass_encb, ingestb;
-  double                aratef, mass_encf, ingestf, aoptratef; */
-  double                htime, gutspace;
-  double                simple_ingest;
+  register int          i;
+  double                fatratio;
+  double                arate, htime, ingest, simple_ingest;
   double                maint, net_energy, kappa, q;
-  double                mort;
-  double                hatchfrac; //bentime, pisctime, 
-  double                eggmort, yolkmort;
-  
+  double                mort, eggmort, yolkmort;
+  double                hatchfrac;              
 
   // Initialize arrays for use in vdpowx
   for (i=0; i<cohort_no[SPECIES]; i++)
@@ -1258,6 +1225,7 @@ static void     UpdateIDcards(double *env, population *pop)
       weight[i]    = pop[SPECIES][i][bone] + max(pop[SPECIES][i][fat] + pop[SPECIES][i][gonads], 0.0);
       mratio[i]    = mass[i]/ARATEPWOPT;
       mratiomin[i] = (1 - mratio[i]);
+
       if (MUSDC > 0) 
         sdmmass[i] = -mass[i]/MUSDMASS;
 
@@ -1265,48 +1233,51 @@ static void     UpdateIDcards(double *env, population *pop)
       popIDcard[SPECIES][i][IDweight]   = weight[i];
       popIDcard[SPECIES][i][IDfatratio] = (pop[SPECIES][i][fat] + pop[SPECIES][i][gonads])/pop[SPECIES][i][bone];
 
-#if (RESOURCE == 0) // Constant 
-      ENV_RESOURCE = plankton; // or set to FEEDING_LEVEL
-#else 
-      ENV_RESOURCE = resource_sin(time);
-#endif
-  
-#if (TEMPERATURE == 0) // Calculate Rm and Ra with constant or varying temperature
-      ENV_TEMP = TEMP;
-#else 
-      ENV_TEMP = temp_sin(time);
-#endif
+      // Constant resource level or seasonally varying constant level
+      #if (RESOURCE == 0) 
+          ENV_RESOURCE = plankton; // plankton is set to FEEDING_LEVEL on line 604
+      #else 
+          ENV_RESOURCE = resource_sin(time); 
+      #endif
 
-#if (RM_CALCULATION == 0) 
-      rm_weight[i] = weight[i];  // Rm calculated with weight = bones + fat + gonads (Ohlberger et al. 2011)
-#else     
-      rm_weight[i] = mass[i];    // Rm calculated with standardized weight
-#endif  
+      #if (TEMPERATURE == 0) // Calculate Rm and Ra with constant or varying temperature
+          ENV_TEMP = TEMP;
+      #else 
+          ENV_TEMP = temp_sin(time);
+      #endif
+
+      // Rm calculation
+      #if (RM_CALCULATION == 0) 
+          rm_weight[i] = weight[i];  // Rm calculated with weight = bones + fat + gonads (Ohlberger et al. 2011)
+      #else     
+          rm_weight[i] = mass[i];    // Rm calculated with standardized weight (Kooijman, 2010)
+      #endif  
+
     }
 
-  if (cohort_no[SPECIES])
-    {
-      #if (RM_CALCULATION == 0)      
-      // Maintenance calculated with weight = bones + fat + gonads (Ohlberger et al. 2011)
-      vdPowx(cohort_no[SPECIES], weight, MAINTE, partial_maint);  // pow(weight, MAINTE); solve for part of maintenance equation
-#else   
-      // Maintenance calculated with standardized weight  
-      vdPowx(cohort_no[SPECIES], mass, MAINTE, partial_maint);   // pow(mass, MAINTE); solve for part of maintenance equation
-#endif  
+      // Length and part of simple ingestion calcuation
+      vdPowx(cohort_no[SPECIES], mass, LWE, length);  // pow(mass, LWE)
+      vdPowx(cohort_no[SPECIES], mass, INGESTE, partial_ingest); // pow(mass, INGEST_C); solve for part of the simplifed ingestion equation, mass ~ standarized weight 
 
-      vdPowx(cohort_no[SPECIES], mass, LWE, length);          // pow(mass, LWE)
+      // Complex ingestion
       vdPowx(cohort_no[SPECIES], mass, DIGTIMEE, partial_htime);      // pow(mass, DIGTIMEE); solve for part of handling time equation, mass ~ standardized weight
-      vdPowx(cohort_no[SPECIES], mass, INGESTE, partial_ingest); // pow(mass, INGESTC); solve for part of the simplifed ingestion equation, mass ~ standarized weight
       vdExp(cohort_no[SPECIES],  mratiomin, aratepE);           // exp(1-(mass/ARATEWOPT))
       vdMul_2(cohort_no[SPECIES], mratio, aratepE, aratep1);    // (mass/Wopt)*(exp(1-mass/Wopt))
-      vdPowx(cohort_no[SPECIES], aratep1, ARATEPEXP, partial_aratep); // pow((mass/ARATEPWOPT)*exp(1-(mass/ARATEWOPT)), ARATEPEXP)      
+      vdPowx(cohort_no[SPECIES], aratep1, ARATEPEXP, partial_arate); // pow((mass/ARATEPWOPT)*exp(1-(mass/ARATEWOPT)), ARATEPEXP)      
 
+      // Size-dependent mortality calculation 
       if (MUSDC > 0) 
-        vdExp(cohort_no[SPECIES], sdmmass, sdmort);             // exp(-mass[i]/MUSDMASS) 
+        vdExp(cohort_no[SPECIES], sdmmass, sdmort);  // exp(-mass[i]/MUSDMASS) 
+      
+      // Rm calculation with total or standardized weight
+      #if (RM_CALCULATION == 0)    // Maintenance calculated with weight = bones + fat + gonads (Ohlberger et al. 2011)  
+          vdPowx(cohort_no[SPECIES], weight, MAINTE, partial_maint);  // pow(weight, MAINTE); solve for part of maintenance equation
+      #else                        // Maintenance calculated with standardized weight  
+          vdPowx(cohort_no[SPECIES], mass, MAINTE, partial_maint);   // pow(mass, MAINTE); solve for part of maintenance equation
+      #endif  
 
       // Steps to calculate Rm - temperature dependent metabolic factor 
       // Solve for Tmax_m which is function x + y
-
       vdPowx(cohort_no[SPECIES], rm_weight, VMAX_M, temporary_Tmax_m); // (x + y)^VMAX_M... temp_Tmax_m is z[i]
       vdMul(cohort_no[SPECIES], YMAX_M, temporary_Tmax_m, Tmax_m); // YMAX_M * (x + y)^VMAX_M... Tmax_m is z[i]
       
@@ -1396,102 +1367,100 @@ static void     UpdateIDcards(double *env, population *pop)
       vdExp(cohort_no[SPECIES], X_mult_1_V_a, exp_X_1_V_a); // exp(X_a * (1 - V_a)) ...exp_X_1_V_a is z[i]
       vdMul_2(cohort_no[SPECIES], V_pow_X_a, exp_X_1_V_a, Ra); // V^(X) * (exp(X * (1 - V))) ... Ra is z[i]
 
-    }
-
+// Calculate egg and yolk mortality
 #if (EGGM_EQ_SDM == 1)
-  eggmort  = MUSDC*exp(-BIRTHWEIGHT/MUSDMASS);
-  yolkmort = eggmort;
+  eggmort  = MUSDC*exp(-BIRTHWEIGHT/MUSDMASS); OG mortality
+  yolkmort = eggmort; OG mortality
 #else
-  eggmort  = EGGMORT;
-  yolkmort = YOLKMORT;
+  eggmort  = EGGMORT; // Parameter egg mortality
+  yolkmort = YOLKMORT; // Parameter yolk moartlity 
 #endif
+
   // Update IDcards for species
   for (i=0; i<cohort_no[SPECIES]; i++)
+  {
+    length[i]    *= LWC;
+    fatratio      = popIDcard[SPECIES][i][IDfatratio];
+    mort          = MUB; // Background mortality 
+
+    htime       = DIGTIMEC*partial_htime[i]/Ra[i];
+    simple_ingest = INGESTC*partial_ingest[i]*Ra[i]; // simple_ingest = INGESTC * MASS ^ INGESTE * Ra 
+    maint         = Rm[i]*MAINTC*partial_maint[i]; // maintenance;  Rm is temperature adjustment factor
+    net_energy    = -maint;
+
+    ingest        = 0.0;
+    kappa         = 0.0;
+    arate         = 0.0;
+
+  // Mortality
+    if (pop[SPECIES][i][age] < EGGPERIOD)
     {
-      length[i] *= LWC;
-      fatratio    = popIDcard[SPECIES][i][IDfatratio];
-      mort        = MUB;
+      // Egg mortality
+      mort       = eggmort;
+      maint      = 0.0;
+      net_energy = 0.0;
+    }
+    else if (pop[SPECIES][i][age] < AGEFEEDING)
+    {
+      // Yolk mortality 
+      hatchfrac  = Sigmoid(pop[SPECIES][i][age], EGGPERIOD, EGGPERIOD+0.5*SPAWNGROUP);
+      mort       = hatchfrac*yolkmort + (1-hatchfrac)*eggmort;
+      maint      = 0.0;
+      net_energy = 0.0;
+    }
+    else if (fatratio > MINCONDITION) 
+    {
+      // Size-dependent mortality 
+      if (MUSDC > 0)  
+          mort += MUSDC*sdmort[i]; // MUSDC*exp(-mass[i]/MUSDMASS) 
+      // Starvation mortality
+      if (fatratio < QS) 
+          mort += MUS*(QS/fatratio - 1.0); // s * (qstarv * x / y - 1)
 
-      htime       = DIGTIMEC*partial_htime[i]/Ra[i]; // handling time = DIGTIMEC * MASS ^ DIGTIMEE * 1/Ra; Ra temp. adjust factor
-      simple_ingest = INGESTC*partial_ingest[i]*Ra[i]; // simple_ingest = INGESTC * MASS ^ INGESTE * Ra 
-      maint       = Rm[i]*MAINTC*partial_maint[i]; // maintenance;  Rm is temperature adjustment factor
-      net_energy  = -maint;
-      
-      ingestps    = 0.0;
-      kappa       = 0.0;
-      aratep      = 0.0;
-      
-      if (pop[SPECIES][i][age] < EGGPERIOD)
-        {
-          // Species mortality
-          mort       = eggmort;
-          maint      = 0.0;
-          net_energy = 0.0;
-        }
-      else if (pop[SPECIES][i][age] < AGEFEEDING)
-        {
-          // SPECIES mortality
-          hatchfrac  = Sigmoid(pop[SPECIES][i][age], EGGPERIOD, EGGPERIOD+0.5*SPAWNGROUP);
-          mort       = hatchfrac*yolkmort + (1-hatchfrac)*eggmort;
-          maint      = 0.0;
-          net_energy = 0.0;
-        }
-      else if (fatratio > MINCONDITION) 
-        {
-          if (MUSDC > 0)  // Size-dependent mortality 
-            mort += MUSDC*sdmort[i];
+  // Ingestion & resources
+    #if (SPECIES_SINGLE == 1) // Single cohort, no feedback on environment
+          ingest     = ENV_RESOURCE*simple_ingest; // Ra accounted for in line 1358
 
-          if (fatratio < QS) // Same condition as y < qstarv * x 
-            mort += MUS*(QS/fatratio - 1.0); // s * (qstarv * x / y - 1)
+    #elif(SPECIES_COHORT == 1)
+          arate     = ARATEPMAX*partial_arate[i]*Ra[i];
+          ingest   = arate*plankton/(1 + arate*htime*plankton); 
+    #endif
 
-          // We are including background mortality rate; specified as constant parameter
-           // mort += MUB*pop[SPECIES][i][number]; // Already accounted for on line 1413
 
-          // Size-selective fishing mortality 
-          // mort   += FMORT*Sigmoid(mass[i], FSTARTW, FHALFW);
+  // Net energy, kappa
+          net_energy = (CONVEFF*ingest - maint); // net_energy = (ke*(1/d1*w^d2)*Ra[i]*FEEDING_LEVEL) - (Rm[i]*MAINTC*maint[i])
 
-#if(SPECIES_SINGLE == 1)
-          ingestps = ENV_RESOURCE*simple_ingest; // Ra accounted for in line 1358
-          //ingestps = FEEDING_LEVEL*simple_ingest; // Ra accounted for in line 1358
-          //ingestps   = FEEDING_LEVEL/htime; // 1/H*feedinglevel = (1/d1*w^d2)*Ra*feedinglevel; Ra accounted for in line (1356) 
-          //ingestps = aratep*Kplankton/(1 + aratep*htime*Kplankton);
-
-#elif(SPECIES_COHORT == 1)
-          aratep     = ARATEPMAX*partial_aratep[i]*Ra[i];
-          ingestps   = aratep*plankton/(1 + aratep*htime*plankton); 
-#endif
-
-          net_energy = (CONVEFF*ingestps - maint); // net_energy = (ke*(1/d1*w^d2)*Ra[i]*FEEDING_LEVEL) - (Rm[i]*MAINTC*maint[i])
-
-          if (length[i] < MATURELEN) q = QJ; // Specifies energy allocation for juveniles or adults
-          else q = QA;
+          if (length[i] < MATURELEN) 
+            q = QJ; // Specifies energy allocation for juveniles or adults
+          else 
+            q = QA;
 
           kappa = 0.0;
           if (net_energy > 0.0)
-            {
+          {
               if (fatratio > q) // fat ratio used for these equations, same as our equations
                 kappa = 1/(q+1);
               else
                 // Default recovery formula changed to a quadratic dependence on fatratio (below), such that recovery in
-                // reversible mass is faster
+                // reversible mass is faster 
                 kappa = fatratio*fatratio/((1+q)*q*q);
             }
 
-          hatchfrac   = Sigmoid(pop[SPECIES][i][age], AGEFEEDING, AGEFEEDING+0.5*SPAWNGROUP);
-          ingestps   *= hatchfrac;
-          net_energy *= hatchfrac;
-          maint      *= hatchfrac;
-          mort       *= hatchfrac;
-          mort       += (1.0 - hatchfrac)*yolkmort;
-        }
+            hatchfrac   = Sigmoid(pop[SPECIES][i][age], AGEFEEDING, AGEFEEDING+0.5*SPAWNGROUP);
+            ingest     *= hatchfrac;
+            net_energy *= hatchfrac;
+            maint      *= hatchfrac;
+            mort       *= hatchfrac;
+            mort       += (1.0 - hatchfrac)*yolkmort;
+          }
 
-      popIDcard[SPECIES][i][IDlength]     = length[i];
-      popIDcard[SPECIES][i][IDmaint]      = maint;
-      popIDcard[SPECIES][i][IDingestPs]   = ingestps;
-      popIDcard[SPECIES][i][IDnet_energy] = net_energy;
-      popIDcard[SPECIES][i][IDkappa]      = kappa;
-      popIDcard[SPECIES][i][IDmort]       = mort;
-    }
+          popIDcard[SPECIES][i][IDlength]     = length[i];
+          popIDcard[SPECIES][i][IDmaint]      = maint;
+          popIDcard[SPECIES][i][IDingestPs]   = ingest;
+          popIDcard[SPECIES][i][IDnet_energy] = net_energy;
+          popIDcard[SPECIES][i][IDkappa]      = kappa;
+          popIDcard[SPECIES][i][IDmort]       = mort;
+        }
 
   return;
 }  
