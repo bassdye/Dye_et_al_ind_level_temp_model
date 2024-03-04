@@ -20,5 +20,5 @@
 #define EVENT_NR                0
 #define DYNAMIC_COHORTS         0
 #define ALGEBRAIC_EQS           0
-#define CHECK_EXTINCTION        1
+#define CHECK_EXTINCTION        2
 	
