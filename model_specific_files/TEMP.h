@@ -21,4 +21,4 @@
 #define DYNAMIC_COHORTS         0
 #define ALGEBRAIC_EQS           0
 #define CHECK_EXTINCTION        1
-#define MEASUREBIFSTATS         0 	
+	

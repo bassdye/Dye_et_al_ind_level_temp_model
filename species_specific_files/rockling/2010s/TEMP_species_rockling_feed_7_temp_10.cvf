@@ -6,17 +6,17 @@
 "Output time interval"                                                       1.0
 "Complete state output interval, 0 for none"                                 1.0
 
-"Minimum allowable number of individuals in cohort"                          0.0       0.0
+"Minimum allowable number of individuals in cohort"                          0.0       
 
-"Relative tolerances for i-state variable #0  age"                           0.0       0.0
-"                        i-state variable #1  bone"                          0.0       0.0
-"                        i-state variable #2  fat"                           0.0       0.0
-"                        i-state variable #3  gonads"                        0.0       0.0
+"Relative tolerances for i-state variable #0  age"                           0.0       
+"                        i-state variable #1  bone"                          0.0       
+"                        i-state variable #2  fat"                           0.0       
+"                        i-state variable #3  gonads"                        0.0       
 
-"Absolute tolerances for i-state variable #0"                                0.0       0.0
-"                        i-state variable #1"                                0.0       0.0
-"                        i-state variable #2"                                0.0       0.0
-"                        i-state variable #3"                                0.0       0.0
+"Absolute tolerances for i-state variable #0"                                0.0       
+"                        i-state variable #1"                                0.0       
+"                        i-state variable #2"                                0.0       
+"                        i-state variable #3"                                0.0       
 
 "[ 0] Number of days in one year 			  YEAR"            250
 "[ 1] Volume : Bottom ratio (m, i.e. avg depth)           VOLBOT_RATIO"     50
@@ -99,7 +99,7 @@
 "[60][PARONE+57]  Temperature sin function amplitude     T_A_HEAT"          50.0
 "[61][PARONE+58]  Start of heat wave                     START_HW"         119.0
 "[62][PARONE+59]  End of heat wave                         END_HW"         132.0
-			    
+
 "Index of the bifurcation parameter"                                        50.0
 "Step size in the bifurcation parameter"                                     0.0001
 "Final value of the bifurcation parameter"                                   1.0
