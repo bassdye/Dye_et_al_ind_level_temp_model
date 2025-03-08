@@ -13,7 +13,6 @@ The Escalator Boxcar Train (EBT) program package developed by [André de Roos](h
   - Resource levels (1.0, 0.7, 0.5) are indicated in the file name (e.g. feed_1 is resource level 1).
 
 ## Dye et al. publication 
-<sup>Submitted to the journal Fish and Fisheries for peer review.<sup>
 
 A generic bioenergetics-based model for predicting how warming and resource levels impact the performance of fish in different guilds 
 
